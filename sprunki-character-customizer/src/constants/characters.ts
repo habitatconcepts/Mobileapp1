@@ -25,4 +25,10 @@ export const characters: CharacterDef[] = [
     description: 'The mysterious Sprunki who loves the night.',
     baseColor: '#FF33A1',
   },
+  {
+    id: 5,
+    name: 'Saylor',
+    description: 'A one-of-a-kind Sprunki, made just for Saylor.',
+    baseColor: '#FFC9A3',
+  },
 ];

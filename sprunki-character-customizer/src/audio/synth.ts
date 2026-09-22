@@ -3,12 +3,13 @@ import type { Phase } from '../types/character';
 /**
  * Procedural music synth for the Sprunki performance mode.
  *
- * Each of the four characters gets its own 2-bar loop at 120 BPM, generated
+ * Each of the five characters gets its own 2-bar loop at 120 BPM, generated
  * as 16-bit PCM WAV bytes with zero audio assets:
  *   1 — drummer: four-on-the-floor kick + hats
  *   2 — bassist: bouncy bassline
  *   3 — keys: Am–F–C–G pad stabs
  *   4 — lead: pentatonic pluck arpeggio
+ *   5 — Saylor: cheerful toy-piano melody
  *
  * Horror phase transposes everything down, adds a sub rumble and an uneasy
  * tremolo. Generation is fully deterministic (seeded noise) so loops and
@@ -140,6 +141,8 @@ const CHORDS: number[][] = [
 
 const LEAD_LINE = [440, 523.25, 587.33, 659.25, 783.99, 659.25, 587.33, 523.25];
 const BASS_LINE = [0, 0, 12, 3, 0, 0, -2, 7]; // semitones from A1 (55 Hz)
+// Saylor's voice: a cheerful bouncy toy-piano melody in C major
+const SAYLOR_LINE = [523.25, 659.25, 783.99, 659.25, 880, 783.99, 659.25, 523.25];
 
 function renderVoice(mix: Float32Array, rand: () => number, characterId: number, horror: boolean): void {
   switch (characterId) {
@@ -187,6 +190,24 @@ function renderVoice(mix: Float32Array, rand: () => number, characterId: number,
       });
       for (let b = 0; b < SYNTH_BEATS; b += 2) {
         hit(mix, rand, { startBeat: b, kind: 'kick', gain: 0.5, horror });
+      }
+      break;
+    }
+    case 5: {
+      // Saylor: bouncy toy-piano melody with a light shaker bounce
+      SAYLOR_LINE.forEach((f, b) => {
+        note(mix, rand, {
+          freq: f,
+          startBeat: b,
+          beats: 0.7,
+          gain: 0.4,
+          osc: tri,
+          attack: 0.02,
+          horror,
+        });
+      });
+      for (let b = 0; b < SYNTH_BEATS; b++) {
+        hit(mix, rand, { startBeat: b + 0.5, kind: 'hat', gain: 0.14, horror });
       }
       break;
     }
@@ -267,7 +288,7 @@ function encodeWav(mix: Float32Array): Uint8Array {
   return buf;
 }
 
-const voiceFor = (characterId: number): number => ((characterId - 1) % 4 + 4) % 4 + 1;
+const voiceFor = (characterId: number): number => ((characterId - 1) % 5 + 5) % 5 + 1;
 
 /**
  * Synthesize the character's performance loop as WAV bytes.

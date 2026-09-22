@@ -129,7 +129,7 @@ export function BodyArt({
 
 export function TopperArt({ characterId, baseColor }: { characterId: number; baseColor: string }): React.JSX.Element {
   const outline = shade(baseColor, -60);
-  const variant = ((characterId - 1) % 4 + 4) % 4;
+  const variant = ((characterId - 1) % 5 + 5) % 5;
   return (
     <G testID={`character-topper-${characterId}`}>
       {variant === 0 && (
@@ -157,6 +157,20 @@ export function TopperArt({ characterId, baseColor }: { characterId: number; bas
         <>
           <Ellipse cx={64} cy={76} rx={10} ry={16} fill={shade(baseColor, -28)} stroke={outline} strokeWidth={4} transform="rotate(-24 64 76)" />
           <Ellipse cx={176} cy={76} rx={10} ry={16} fill={shade(baseColor, -28)} stroke={outline} strokeWidth={4} transform="rotate(24 176 76)" />
+        </>
+      )}
+      {variant === 4 && (
+        <>
+          {/* Saylor's blonde kid haircut with two little tufts */}
+          <Path
+            d="M64 62 Q60 30 96 24 L88 10 L106 22 Q120 19 134 22 L152 10 L144 24 Q176 30 172 62 Q146 46 118 46 Q92 46 64 62 Z"
+            fill="#E8C15A"
+            stroke={outline}
+            strokeWidth={4}
+            strokeLinejoin="round"
+          />
+          <Path d="M96 36 Q106 32 118 34" fill="none" stroke="#C99A2E" strokeWidth={3} strokeLinecap="round" />
+          <Path d="M128 34 Q140 32 150 36" fill="none" stroke="#C99A2E" strokeWidth={3} strokeLinecap="round" />
         </>
       )}
     </G>

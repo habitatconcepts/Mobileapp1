@@ -42,18 +42,19 @@ describe('synthesizeLoop', () => {
   });
 
   it('gives each character a distinct voice and horror a distinct mix', () => {
-    const voices = [1, 2, 3, 4].map((id) => synthesizeLoop(id, 'normal'));
+    const voices = [1, 2, 3, 4, 5].map((id) => synthesizeLoop(id, 'normal'));
     for (let i = 0; i < voices.length; i++) {
       for (let j = i + 1; j < voices.length; j++) {
         expect(voices[i]).not.toEqual(voices[j]);
       }
     }
     expect(synthesizeLoop(1, 'horror')).not.toEqual(synthesizeLoop(1, 'normal'));
+    expect(synthesizeLoop(5, 'horror')).not.toEqual(synthesizeLoop(5, 'normal'));
   });
 
-  it('wraps out-of-range character ids onto the four voices', () => {
-    expect(synthesizeLoop(5, 'normal')).toEqual(synthesizeLoop(1, 'normal'));
-    expect(synthesizeLoop(0, 'normal')).toEqual(synthesizeLoop(4, 'normal'));
+  it('wraps out-of-range character ids onto the five voices', () => {
+    expect(synthesizeLoop(6, 'normal')).toEqual(synthesizeLoop(1, 'normal'));
+    expect(synthesizeLoop(0, 'normal')).toEqual(synthesizeLoop(5, 'normal'));
   });
 
   it('produces audible, normalized audio', () => {

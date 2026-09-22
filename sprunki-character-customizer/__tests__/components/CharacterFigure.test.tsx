@@ -134,4 +134,23 @@ describe('CharacterFigure', () => {
     expect(() => horror.getByTestId('expression-happy')).toThrow();
     expect(JSON.stringify(horror.toJSON())).not.toBe(JSON.stringify(normal.toJSON()));
   });
+
+  it("renders Saylor (id 5) with his blonde hair topper, even in horror phase", async () => {
+    // react-native-svg serializes colors as int payloads, so match the hair path's d string
+    const HAIR_PATH = 'M64 62 Q60 30 96 24';
+    const saylor = await render(<CharacterFigure config={makeConfig({ characterId: 5 })} />);
+    expect(saylor.getByTestId('character-topper-5')).toBeTruthy();
+    expect(JSON.stringify(saylor.toJSON())).toContain(HAIR_PATH);
+    const horrorSaylor = await render(
+      <CharacterFigure config={makeConfig({ characterId: 5, phase: 'horror' })} />,
+    );
+    expect(horrorSaylor.getByTestId('character-topper-5')).toBeTruthy();
+    expect(JSON.stringify(horrorSaylor.toJSON())).toContain(HAIR_PATH);
+  });
+
+  it('gives every other character a different topper than Saylor', async () => {
+    const one = JSON.stringify((await render(<CharacterFigure config={makeConfig({ characterId: 1 })} />)).toJSON());
+    const saylor = JSON.stringify((await render(<CharacterFigure config={makeConfig({ characterId: 5 })} />)).toJSON());
+    expect(saylor).not.toBe(one);
+  });
 });
