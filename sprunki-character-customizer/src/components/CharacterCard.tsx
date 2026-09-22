@@ -26,6 +26,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ character, onPress }) => 
           outfit: null,
           accessories: [],
           background: 'city',
+          phase: 'normal',
         }}
         size={120}
       />

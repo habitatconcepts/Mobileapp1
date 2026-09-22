@@ -30,6 +30,7 @@ const CONFIG: CharacterConfig = {
   outfit: 'sporty',
   accessories: ['hat'],
   background: 'city',
+  phase: 'normal',
 };
 
 const flushPromises = () => act(async () => {});

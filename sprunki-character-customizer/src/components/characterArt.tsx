@@ -1,6 +1,6 @@
 import React from 'react';
 import { Circle, Ellipse, G, Line, Path, Polygon, Rect, Text } from 'react-native-svg';
-import type { AccessoryId, BackgroundId, ExpressionId, OutfitId } from '../types/character';
+import type { AccessoryId, BackgroundId, ExpressionId, OutfitId, Phase } from '../types/character';
 
 /**
  * Procedural vector art for the Sprunki character renderer.
@@ -61,10 +61,24 @@ const BACKGROUND_TINTS: Record<BackgroundId, string> = {
   space: '#5B4B8A',
 };
 
-export function BackgroundWash({ background }: { background: BackgroundId }): React.JSX.Element {
+export function BackgroundWash({
+  background,
+  phase = 'normal',
+}: {
+  background: BackgroundId;
+  phase?: Phase;
+}): React.JSX.Element {
+  const horror = phase === 'horror';
   return (
     <G testID={`background-${background}`}>
-      <Circle cx={120} cy={120} r={112} fill={BACKGROUND_TINTS[background]} opacity={0.32} />
+      <Circle
+        cx={120}
+        cy={120}
+        r={112}
+        fill={horror ? '#1A0000' : BACKGROUND_TINTS[background]}
+        opacity={horror ? 0.85 : 0.32}
+      />
+      {horror && <Circle cx={120} cy={120} r={112} fill="#7A0000" opacity={0.25} />}
     </G>
   );
 }
@@ -73,9 +87,17 @@ export function BackgroundWash({ background }: { background: BackgroundId }): Re
 // Body: feet, arms, blob torso, belly highlight.
 // ---------------------------------------------------------------------------
 
-export function BodyArt({ baseColor }: { baseColor: string }): React.JSX.Element {
-  const outline = shade(baseColor, -60);
-  const limb = shade(baseColor, -28);
+export function BodyArt({
+  baseColor,
+  phase = 'normal',
+}: {
+  baseColor: string;
+  phase?: Phase;
+}): React.JSX.Element {
+  const horror = phase === 'horror';
+  const body = horror ? shade(baseColor, -72) : baseColor;
+  const outline = shade(body, -60);
+  const limb = shade(body, -28);
   return (
     <G testID="character-body">
       {/* feet */}
@@ -85,9 +107,17 @@ export function BodyArt({ baseColor }: { baseColor: string }): React.JSX.Element
       <Ellipse cx={50} cy={140} rx={13} ry={24} fill={limb} stroke={outline} strokeWidth={5} transform="rotate(12 50 140)" />
       <Ellipse cx={190} cy={140} rx={13} ry={24} fill={limb} stroke={outline} strokeWidth={5} transform="rotate(-12 190 140)" />
       {/* blob torso */}
-      <Rect x={58} y={44} width={124} height={156} rx={58} fill={baseColor} stroke={outline} strokeWidth={6} />
+      <Rect x={58} y={44} width={124} height={156} rx={58} fill={body} stroke={outline} strokeWidth={6} />
       {/* belly highlight */}
-      <Ellipse cx={120} cy={154} rx={36} ry={46} fill="#FFFFFF" opacity={0.22} />
+      <Ellipse cx={120} cy={154} rx={36} ry={46} fill="#FFFFFF" opacity={horror ? 0.06 : 0.22} />
+      {horror && (
+        <>
+          {/* cracks in the corrupted body */}
+          <Path d="M84 70 L96 96 L88 108 L102 132" fill="none" stroke="#0D0D0D" strokeWidth={4} strokeLinecap="round" />
+          <Path d="M156 64 L146 92 L156 104 L144 128" fill="none" stroke="#0D0D0D" strokeWidth={4} strokeLinecap="round" />
+          <Path d="M110 170 L118 186 L112 196" fill="none" stroke="#0D0D0D" strokeWidth={4} strokeLinecap="round" />
+        </>
+      )}
     </G>
   );
 }
@@ -265,13 +295,52 @@ function SleepyFace({ baseColor }: { baseColor: string }): React.JSX.Element {
   );
 }
 
+/** Horror phase face: corrupted version of the character. Overrides expression. */
+function HorrorFace(): React.JSX.Element {
+  return (
+    <G testID="horror-face">
+      {/* dark sunken eye sockets */}
+      <Ellipse cx={94} cy={102} rx={24} ry={26} fill="#0D0D0D" opacity={0.9} />
+      <Ellipse cx={146} cy={102} rx={24} ry={26} fill="#0D0D0D" opacity={0.9} />
+      {/* glowing red pupils */}
+      <Circle cx={94} cy={106} r={9} fill="#FF1A1A" />
+      <Circle cx={146} cy={106} r={9} fill="#FF1A1A" />
+      <Circle cx={94} cy={106} r={9} fill="#FF6B6B" opacity={0.45} />
+      <Circle cx={146} cy={106} r={9} fill="#FF6B6B" opacity={0.45} />
+      <Circle cx={97} cy={103} r={3} fill="#FFFFFF" opacity={0.9} />
+      <Circle cx={149} cy={103} r={3} fill="#FFFFFF" opacity={0.9} />
+      {/* jagged screaming mouth */}
+      <Path
+        d="M96 140 L106 152 L114 138 L124 154 L134 140 L144 154 L140 170 L100 170 Z"
+        fill="#2B0A0A"
+        stroke="#0D0D0D"
+        strokeWidth={4}
+        strokeLinejoin="round"
+      />
+      <Path d="M108 158 L132 158" stroke="#7A0E0E" strokeWidth={3} strokeLinecap="round" />
+      {/* blood drips from the eyes */}
+      <Path d="M88 126 q-3 12 2 20 q5 -8 1 -20" fill="#8E0E0E" />
+      <Path d="M152 126 q-3 12 2 20 q5 -8 1 -20" fill="#8E0E0E" />
+    </G>
+  );
+}
+
 export function FaceArt({
   expression,
   baseColor,
+  phase = 'normal',
 }: {
   expression: ExpressionId;
   baseColor: string;
+  phase?: Phase;
 }): React.JSX.Element {
+  if (phase === 'horror') {
+    return (
+      <G testID="expression-horror">
+        <HorrorFace />
+      </G>
+    );
+  }
   return (
     <G testID={`expression-${expression}`}>
       {expression === 'happy' && <HappyFace />}

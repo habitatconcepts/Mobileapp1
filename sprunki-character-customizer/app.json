@@ -1,1 +1,38 @@
-{"expo":{"android":{"adaptiveIcon":{"backgroundColor":"#1A1C2E","foregroundImage":"./assets/adaptive-icon.png"},"package":"com.habitatconcepts.sprunkicustomizer"},"assetBundlePatterns":["**/*"],"icon":"./assets/icon.png","ios":{"bundleIdentifier":"com.habitatconcepts.sprunkicustomizer","supportsTablet":true},"name":"Sprunki Character Customizer","orientation":"portrait","slug":"sprunki-character-customizer","splash":{"backgroundColor":"#1A1C2E","image":"./assets/icon.png","resizeMode":"contain"},"updates":{"fallbackToCacheTimeout":0},"userInterfaceStyle":"automatic","version":"1.0.0","web":{"favicon":"./assets/icon.png"}}}
+{
+  "expo": {
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#1A1C2E",
+        "foregroundImage": "./assets/adaptive-icon.png"
+      },
+      "package": "com.habitatconcepts.sprunkicustomizer"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "icon": "./assets/icon.png",
+    "ios": {
+      "bundleIdentifier": "com.habitatconcepts.sprunkicustomizer",
+      "supportsTablet": true
+    },
+    "name": "Sprunki Character Customizer",
+    "orientation": "portrait",
+    "slug": "sprunki-character-customizer",
+    "splash": {
+      "backgroundColor": "#1A1C2E",
+      "image": "./assets/icon.png",
+      "resizeMode": "contain"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "userInterfaceStyle": "automatic",
+    "version": "1.0.0",
+    "web": {
+      "favicon": "./assets/icon.png"
+    },
+    "plugins": [
+      "expo-audio"
+    ]
+  }
+}

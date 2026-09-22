@@ -14,6 +14,7 @@ const DEFAULTS: CharacterConfig = {
   outfit: null,
   accessories: [],
   background: 'city',
+  phase: 'normal',
 };
 
 describe('useCustomizer', () => {
@@ -84,11 +85,41 @@ describe('useCustomizer', () => {
       outfit: 'fantasy',
       accessories: ['scarf'],
       background: 'desert',
+      phase: 'horror',
     };
     await act(() => {
       result.current.replaceConfig(saved);
     });
     expect(result.current.config).toEqual(saved);
+  });
+
+  it('replaceConfig defaults a legacy phaseless save to normal', async () => {
+    const { result } = await renderHook(() => useCustomizer(), { wrapper });
+    const legacy = {
+      characterId: 2,
+      baseColor: '#ABCDEF',
+      expression: 'excited',
+      outfit: 'fantasy',
+      accessories: ['scarf'],
+      background: 'desert',
+    } as CharacterConfig;
+    await act(() => {
+      result.current.replaceConfig(legacy);
+    });
+    expect(result.current.config.phase).toBe('normal');
+  });
+
+  it('setPhase switches between normal and horror', async () => {
+    const { result } = await renderHook(() => useCustomizer(), { wrapper });
+    expect(result.current.config.phase).toBe('normal');
+    await act(() => {
+      result.current.setPhase('horror');
+    });
+    expect(result.current.config.phase).toBe('horror');
+    await act(() => {
+      result.current.setPhase('normal');
+    });
+    expect(result.current.config.phase).toBe('normal');
   });
 
   it('reset restores the default config', async () => {

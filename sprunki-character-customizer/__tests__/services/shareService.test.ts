@@ -25,6 +25,7 @@ const CONFIG: CharacterConfig = {
   outfit: 'casual',
   accessories: ['hat', 'scarf'],
   background: 'city',
+  phase: 'normal',
 };
 
 const previewRef = { current: {} as View } as RefObject<View | null>;

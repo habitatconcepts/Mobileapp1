@@ -4,6 +4,8 @@
     "@react-navigation/native": "^7.0.0",
     "@react-navigation/stack": "^7.0.0",
     "expo": "~57.0.0",
+    "expo-audio": "~57.0.5",
+    "expo-file-system": "~57.0.7",
     "expo-font": "~57.0.0",
     "expo-sharing": "~57.0.0",
     "react": "19.2.3",
@@ -31,7 +33,12 @@
     "typescript-eslint": "^8.70.1"
   },
   "jest": {
-    "preset": "@react-native/jest-preset"
+    "preset": "@react-native/jest-preset",
+    "moduleNameMapper": {
+      "^expo-file-system$": "<rootDir>/__tests__/mocks/expoFileSystemMock.ts",
+      "^expo-audio$": "<rootDir>/__tests__/mocks/expoAudioMock.ts"
+    },
+    "testPathIgnorePatterns": ["/node_modules/", "/__tests__/mocks/"]
   },
   "main": "index.js",
   "name": "sprunki-character-customizer",

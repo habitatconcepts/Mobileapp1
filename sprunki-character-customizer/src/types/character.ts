@@ -31,6 +31,9 @@ export type AccessoryId =
 
 export type BackgroundId = 'city' | 'desert' | 'forest' | 'space';
 
+/** Sprunki phase: the character's normal look, or its corrupted horror form. */
+export type Phase = 'normal' | 'horror';
+
 export interface CharacterConfig {
   characterId: number;
   baseColor: string; // hex, defaults to the character's baseColor; user can recolor
@@ -38,4 +41,5 @@ export interface CharacterConfig {
   outfit: OutfitId; // null = no outfit
   accessories: AccessoryId[]; // multi-select, toggle
   background: BackgroundId;
+  phase: Phase;
 }

@@ -12,6 +12,7 @@ import type {
   CharacterConfig,
   ExpressionId,
   OutfitId,
+  Phase,
 } from '../types/character';
 import { characters } from '../constants/characters';
 
@@ -25,6 +26,7 @@ export const defaultConfig: CharacterConfig = {
   outfit: null,
   accessories: [],
   background: 'city',
+  phase: 'normal',
 };
 
 type CustomizerAction =
@@ -34,6 +36,7 @@ type CustomizerAction =
   | { type: 'SET_OUTFIT'; outfit: OutfitId }
   | { type: 'TOGGLE_ACCESSORY'; accessory: AccessoryId }
   | { type: 'SET_BACKGROUND'; background: BackgroundId }
+  | { type: 'SET_PHASE'; phase: Phase }
   | { type: 'REPLACE_CONFIG'; config: CharacterConfig }
   | { type: 'RESET' };
 
@@ -60,8 +63,15 @@ function customizerReducer(state: CharacterConfig, action: CustomizerAction): Ch
       };
     case 'SET_BACKGROUND':
       return { ...state, background: action.background };
+    case 'SET_PHASE':
+      return { ...state, phase: action.phase };
     case 'REPLACE_CONFIG':
-      return { ...action.config, accessories: [...action.config.accessories] };
+      // Older saves predate the phase field — default them to normal.
+      return {
+        ...action.config,
+        phase: action.config.phase ?? 'normal',
+        accessories: [...action.config.accessories],
+      };
     case 'RESET':
       return { ...defaultConfig, accessories: [] };
     default:
@@ -77,6 +87,7 @@ export interface CustomizerContextValue {
   setOutfit: (outfit: OutfitId) => void;
   toggleAccessory: (accessory: AccessoryId) => void;
   setBackground: (background: BackgroundId) => void;
+  setPhase: (phase: Phase) => void;
   /** Replace the whole config (used when loading a saved character back into the customizer). */
   replaceConfig: (config: CharacterConfig) => void;
   reset: () => void;
@@ -105,6 +116,9 @@ export function CharacterProvider({ children }: { children: ReactNode }): React.
   const setBackground = useCallback((background: BackgroundId) => {
     dispatch({ type: 'SET_BACKGROUND', background });
   }, []);
+  const setPhase = useCallback((phase: Phase) => {
+    dispatch({ type: 'SET_PHASE', phase });
+  }, []);
   const replaceConfig = useCallback((next: CharacterConfig) => {
     dispatch({ type: 'REPLACE_CONFIG', config: next });
   }, []);
@@ -121,6 +135,7 @@ export function CharacterProvider({ children }: { children: ReactNode }): React.
       setOutfit,
       toggleAccessory,
       setBackground,
+      setPhase,
       replaceConfig,
       reset,
     }),
@@ -132,6 +147,7 @@ export function CharacterProvider({ children }: { children: ReactNode }): React.
       setOutfit,
       toggleAccessory,
       setBackground,
+      setPhase,
       replaceConfig,
       reset,
     ],

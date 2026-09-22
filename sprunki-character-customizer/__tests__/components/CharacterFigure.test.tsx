@@ -38,6 +38,7 @@ function makeConfig(overrides: Partial<CharacterConfig> = {}): CharacterConfig {
     outfit: null,
     accessories: [],
     background: 'city',
+    phase: 'normal',
     ...overrides,
   };
 }
@@ -119,5 +120,18 @@ describe('CharacterFigure', () => {
     expect(withAccessory).not.toBe(plain);
     expect(recolored).not.toBe(plain);
     expect(newBackground).not.toBe(plain);
+  });
+
+  it('renders the horror phase with the corrupted face instead of the expression', async () => {
+    const normal = await render(<CharacterFigure config={makeConfig({ expression: 'happy' })} />);
+    const horror = await render(
+      <CharacterFigure config={makeConfig({ expression: 'happy', phase: 'horror' })} />,
+    );
+    expect(normal.getByTestId('expression-happy')).toBeTruthy();
+    expect(() => normal.getByTestId('expression-horror')).toThrow();
+    expect(horror.getByTestId('expression-horror')).toBeTruthy();
+    expect(horror.getByTestId('horror-face')).toBeTruthy();
+    expect(() => horror.getByTestId('expression-happy')).toThrow();
+    expect(JSON.stringify(horror.toJSON())).not.toBe(JSON.stringify(normal.toJSON()));
   });
 });
