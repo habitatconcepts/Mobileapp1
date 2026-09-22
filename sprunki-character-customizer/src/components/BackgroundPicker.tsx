@@ -1,31 +1,34 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import type { BackgroundId } from '../types/character';
+import { backgrounds } from '../constants/backgrounds';
 
-const backgrounds = [
-  { id: 1, name: 'Forest', image: require('../../assets/backgrounds/forest.png') },
-  { id: 2, name: 'Desert', image: require('../../assets/backgrounds/desert.png') },
-  { id: 3, name: 'City', image: require('../../assets/backgrounds/city.png') },
-  { id: 4, name: 'Space', image: require('../../assets/backgrounds/space.png') },
-];
+interface BackgroundPickerProps {
+  selectedBackground: BackgroundId;
+  onSelect: (background: BackgroundId) => void;
+}
 
-const BackgroundPicker = ({ selectedBackground, onSelectBackground }) => {
+const BackgroundPicker: React.FC<BackgroundPickerProps> = ({ selectedBackground, onSelect }) => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Choose a Background</Text>
-      <View style={styles.backgroundList}>
-        {backgrounds.map((background) => (
-          <TouchableOpacity
-            key={background.id}
-            style={[
-              styles.backgroundItem,
-              selectedBackground === background.id && styles.selectedBackground,
-            ]}
-            onPress={() => onSelectBackground(background.id)}
-          >
-            <Image source={background.image} style={styles.backgroundImage} />
-            <Text style={styles.backgroundName}>{background.name}</Text>
-          </TouchableOpacity>
-        ))}
+    <View testID="background-picker" style={styles.container}>
+      <View style={styles.row}>
+        {backgrounds.map((background) => {
+          const selected = background.id === selectedBackground;
+          return (
+            <TouchableOpacity
+              key={background.id}
+              testID={`background-${background.id}`}
+              accessibilityRole="button"
+              accessibilityLabel={`Background ${background.name}`}
+              accessibilityState={{ selected }}
+              style={[styles.item, selected && styles.selectedItem]}
+              onPress={() => onSelect(background.id)}
+            >
+              <Image source={background.image} style={styles.thumbnail} resizeMode="cover" />
+              <Text style={[styles.name, selected && styles.selectedName]}>{background.name}</Text>
+            </TouchableOpacity>
+          );
+        })}
       </View>
     </View>
   );
@@ -33,37 +36,39 @@ const BackgroundPicker = ({ selectedBackground, onSelectBackground }) => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 12,
-  },
-  backgroundList: {
+  row: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    justifyContent: 'space-between',
   },
-  backgroundItem: {
-    width: '45%',
-    margin: '2.5%',
-    alignItems: 'center',
-    borderWidth: 2,
+  item: {
+    width: '48%',
+    marginBottom: 12,
+    borderWidth: 3,
     borderColor: 'transparent',
-    borderRadius: 8,
+    borderRadius: 10,
     overflow: 'hidden',
+    backgroundColor: '#FFFFFF',
   },
-  selectedBackground: {
-    borderColor: '#007BFF',
+  selectedItem: {
+    borderColor: '#FF6F61',
   },
-  backgroundImage: {
+  thumbnail: {
     width: '100%',
-    height: 100,
-    borderRadius: 8,
+    height: 90,
   },
-  backgroundName: {
-    marginTop: 8,
+  name: {
     textAlign: 'center',
+    paddingVertical: 6,
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333333',
+  },
+  selectedName: {
+    color: '#FF6F61',
   },
 });
 

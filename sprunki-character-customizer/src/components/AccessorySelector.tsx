@@ -1,57 +1,74 @@
 import React from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import type { AccessoryId } from '../types/character';
 import { accessories } from '../constants/accessories';
 
 interface AccessorySelectorProps {
-  selectedAccessory: string;
-  onAccessorySelect: (accessory: string) => void;
+  /** Currently worn accessories. */
+  selectedAccessories: AccessoryId[];
+  onToggle: (accessory: AccessoryId) => void;
 }
 
-const AccessorySelector: React.FC<AccessorySelectorProps> = ({ selectedAccessory, onAccessorySelect }) => {
-  const renderAccessoryItem = ({ item }: { item: string }) => (
-    <TouchableOpacity
-      style={[styles.accessoryItem, selectedAccessory === item && styles.selectedItem]}
-      onPress={() => onAccessorySelect(item)}
-    >
-      <Text style={styles.accessoryText}>{item}</Text>
-    </TouchableOpacity>
-  );
-
+/**
+ * Multi-toggle accessory picker. There is no separate hat concept —
+ * hats live in the accessories list, so this is the only accessory UI.
+ */
+const AccessorySelector: React.FC<AccessorySelectorProps> = ({ selectedAccessories, onToggle }) => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Select an Accessory</Text>
-      <FlatList
-        data={accessories}
-        renderItem={renderAccessoryItem}
-        keyExtractor={(item) => item}
-        horizontal
-      />
+    <View testID="accessory-selector" style={styles.container}>
+      <View style={styles.row}>
+        {accessories.map((accessory) => {
+          const selected = selectedAccessories.indexOf(accessory.id) !== -1;
+          return (
+            <TouchableOpacity
+              key={accessory.id}
+              testID={`accessory-${accessory.id}`}
+              accessibilityRole="button"
+              accessibilityLabel={`Accessory ${accessory.name}`}
+              accessibilityState={{ selected }}
+              style={[styles.chip, selected && styles.selectedChip]}
+              onPress={() => onToggle(accessory.id)}
+            >
+              <Text style={[styles.chipText, selected && styles.selectedChipText]}>
+                {selected ? '✓ ' : ''}{accessory.name}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 8,
+  row: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
   },
-  accessoryItem: {
-    padding: 10,
-    marginRight: 10,
+  chip: {
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    margin: 4,
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
+    borderColor: '#CCCCCC',
+    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
   },
-  selectedItem: {
-    borderColor: '#007BFF',
-    backgroundColor: '#E0F7FA',
+  selectedChip: {
+    backgroundColor: '#6B5B95',
+    borderColor: '#6B5B95',
   },
-  accessoryText: {
-    fontSize: 16,
+  chipText: {
+    fontSize: 15,
+    color: '#333333',
+  },
+  selectedChipText: {
+    color: '#FFFFFF',
+    fontWeight: '600',
   },
 });
 

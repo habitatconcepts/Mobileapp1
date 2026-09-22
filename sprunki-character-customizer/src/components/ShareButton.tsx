@@ -1,43 +1,42 @@
 import React from 'react';
-import { TouchableOpacity, Text, Share, StyleSheet } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 
-const ShareButton = ({ character }) => {
-  const onShare = async () => {
-    try {
-      const result = await Share.share({
-        message: `Check out my Sprunki character: ${character.name}!`,
-      });
-      if (result.action === Share.sharedAction) {
-        if (result.activityType) {
-          // shared with activity type of result.activityType
-        } else {
-          // shared
-        }
-      } else if (result.action === Share.dismissedAction) {
-        // dismissed
-      }
-    } catch (error) {
-      alert(error.message);
-    }
-  };
+interface ShareButtonProps {
+  onPress: () => void;
+  disabled?: boolean;
+}
 
+const ShareButton: React.FC<ShareButtonProps> = ({ onPress, disabled = false }) => {
   return (
-    <TouchableOpacity style={styles.button} onPress={onShare}>
-      <Text style={styles.buttonText}>Share Character</Text>
+    <TouchableOpacity
+      testID="share-button"
+      accessibilityRole="button"
+      accessibilityLabel="Share character"
+      style={[styles.button, disabled && styles.disabled]}
+      onPress={onPress}
+      disabled={disabled}
+    >
+      <Text style={styles.buttonText}>Share</Text>
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: '#4CAF50',
-    padding: 10,
-    borderRadius: 5,
+    backgroundColor: '#FF6F61',
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 10,
     alignItems: 'center',
+    marginVertical: 8,
+  },
+  disabled: {
+    opacity: 0.5,
   },
   buttonText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 17,
+    fontWeight: '700',
   },
 });
 

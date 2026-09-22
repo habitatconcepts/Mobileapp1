@@ -1,35 +1,116 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react';
+import type { CharacterConfig } from '../types/character';
+import { useCustomizer } from './CharacterContext';
+import { clearGalleryStorage, loadGalleryStorage, saveGalleryStorage } from '../services/storageService';
 
-interface GalleryContextType {
-  gallery: string[];
-  addCharacterToGallery: (character: string) => void;
-  removeCharacterFromGallery: (character: string) => void;
+export interface SavedCharacter {
+  id: string;
+  config: CharacterConfig;
+  createdAt: string;
 }
 
-const GalleryContext = createContext<GalleryContextType | undefined>(undefined);
+export interface GalleryContextValue {
+  saved: SavedCharacter[];
+  /** Total customizations ever saved (persisted; survives deletions, cleared on data reset). */
+  customizationCount: number;
+  addToGallery: (config: CharacterConfig) => Promise<SavedCharacter>;
+  removeFromGallery: (id: string) => void;
+  /** Load a saved character back into the customizer so the user can re-edit it. */
+  loadIntoCustomizer: (saved: SavedCharacter) => void;
+  clearGallery: () => Promise<void>;
+}
 
-export const GalleryProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [gallery, setGallery] = useState<string[]>([]);
+const GalleryContext = createContext<GalleryContextValue | undefined>(undefined);
 
-  const addCharacterToGallery = (character: string) => {
-    setGallery((prevGallery) => [...prevGallery, character]);
-  };
+const makeId = (): string =>
+  `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
 
-  const removeCharacterFromGallery = (character: string) => {
-    setGallery((prevGallery) => prevGallery.filter((item) => item !== character));
-  };
+export function GalleryProvider({ children }: { children: ReactNode }): React.ReactElement {
+  const [saved, setSaved] = useState<SavedCharacter[]>([]);
+  const [customizationCount, setCustomizationCount] = useState(0);
+  const { replaceConfig } = useCustomizer();
 
-  return (
-    <GalleryContext.Provider value={{ gallery, addCharacterToGallery, removeCharacterFromGallery }}>
-      {children}
-    </GalleryContext.Provider>
+  useEffect(() => {
+    let cancelled = false;
+    loadGalleryStorage().then(({ items, customizationCount: count }) => {
+      if (!cancelled) {
+        setSaved(items);
+        setCustomizationCount(count);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const addToGallery = useCallback(
+    async (config: CharacterConfig): Promise<SavedCharacter> => {
+      const entry: SavedCharacter = {
+        id: makeId(),
+        config: { ...config, accessories: [...config.accessories] },
+        createdAt: new Date().toISOString(),
+      };
+      const next = [entry, ...saved];
+      const nextCount = customizationCount + 1;
+      setSaved(next);
+      setCustomizationCount(nextCount);
+      await saveGalleryStorage(next, nextCount);
+      return entry;
+    },
+    [saved, customizationCount],
   );
-};
 
-export const useGallery = (): GalleryContextType => {
-  const context = useContext(GalleryContext);
-  if (!context) {
+  const removeFromGallery = useCallback(
+    (id: string) => {
+      const next = saved.filter((item) => item.id !== id);
+      setSaved(next);
+      saveGalleryStorage(next, customizationCount).catch(() => {
+        // Persistence is best-effort; the in-memory state is already updated.
+      });
+    },
+    [saved, customizationCount],
+  );
+
+  const loadIntoCustomizer = useCallback(
+    (entry: SavedCharacter) => {
+      replaceConfig(entry.config);
+    },
+    [replaceConfig],
+  );
+
+  const clearGallery = useCallback(async () => {
+    await clearGalleryStorage();
+    setSaved([]);
+    setCustomizationCount(0);
+  }, []);
+
+  const value = useMemo<GalleryContextValue>(
+    () => ({
+      saved,
+      customizationCount,
+      addToGallery,
+      removeFromGallery,
+      loadIntoCustomizer,
+      clearGallery,
+    }),
+    [saved, customizationCount, addToGallery, removeFromGallery, loadIntoCustomizer, clearGallery],
+  );
+
+  return <GalleryContext.Provider value={value}>{children}</GalleryContext.Provider>;
+}
+
+export function useGallery(): GalleryContextValue {
+  const ctx = useContext(GalleryContext);
+  if (!ctx) {
     throw new Error('useGallery must be used within a GalleryProvider');
   }
-  return context;
-};
+  return ctx;
+}
