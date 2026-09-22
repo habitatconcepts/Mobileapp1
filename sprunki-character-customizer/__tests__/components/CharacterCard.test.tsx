@@ -1,29 +1,27 @@
 import React from 'react';
-import { render } from '@testing-library/react-native';
+import { render, fireEvent } from '@testing-library/react-native';
 import CharacterCard from '../../src/components/CharacterCard';
+import { characters } from '../../src/constants/characters';
+
+// CharacterFigure draws with react-native-svg; mock it so this test stays
+// focused on the card layout and press behavior.
+jest.mock('../../src/components/CharacterFigure', () => 'CharacterFigure');
 
 describe('CharacterCard', () => {
-  const mockCharacter = {
-    name: 'Sprunki',
-    outfit: 'Casual',
-    accessories: ['Glasses'],
-    expression: 'Happy',
-    background: 'Blue',
-  };
+  const character = characters[0];
 
-  it('renders correctly with character data', () => {
-    const { getByText } = render(<CharacterCard character={mockCharacter} />);
-    
-    expect(getByText('Sprunki')).toBeTruthy();
-    expect(getByText('Outfit: Casual')).toBeTruthy();
-    expect(getByText('Accessories: Glasses')).toBeTruthy();
-    expect(getByText('Expression: Happy')).toBeTruthy();
+  it('renders the character name and description', async () => {
+    const { getByText } = await render(<CharacterCard character={character} onPress={() => {}} />);
+    expect(getByText(character.name)).toBeTruthy();
+    expect(getByText(character.description)).toBeTruthy();
   });
 
-  it('displays the correct background color', () => {
-    const { getByTestId } = render(<CharacterCard character={mockCharacter} />);
-    
-    const card = getByTestId('character-card');
-    expect(card.props.style.backgroundColor).toBe('Blue');
+  it('calls onPress when tapped', async () => {
+    const onPress = jest.fn();
+    const { getByTestId } = await render(
+      <CharacterCard character={character} onPress={onPress} />,
+    );
+    await fireEvent.press(getByTestId(`character-card-${character.id}`));
+    expect(onPress).toHaveBeenCalledTimes(1);
   });
 });

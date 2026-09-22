@@ -1,10 +1,18 @@
-export const expressions = [
-  { id: 1, name: 'Happy', image: require('../assets/expressions/happy.png') },
-  { id: 2, name: 'Sad', image: require('../assets/expressions/sad.png') },
-  { id: 3, name: 'Angry', image: require('../assets/expressions/angry.png') },
-  { id: 4, name: 'Surprised', image: require('../assets/expressions/surprised.png') },
-  { id: 5, name: 'Confused', image: require('../assets/expressions/confused.png') },
-  { id: 6, name: 'Excited', image: require('../assets/expressions/excited.png') },
-  { id: 7, name: 'Bored', image: require('../assets/expressions/bored.png') },
-  { id: 8, name: 'Sleepy', image: require('../assets/expressions/sleepy.png') },
+import type { ExpressionId } from '../types/character';
+
+export interface ExpressionDef {
+  id: ExpressionId;
+  name: string;
+}
+
+// Faces are drawn procedurally by CharacterFigure — no image assets.
+export const expressions: ExpressionDef[] = [
+  { id: 'happy', name: 'Happy' },
+  { id: 'sad', name: 'Sad' },
+  { id: 'angry', name: 'Angry' },
+  { id: 'surprised', name: 'Surprised' },
+  { id: 'confused', name: 'Confused' },
+  { id: 'excited', name: 'Excited' },
+  { id: 'bored', name: 'Bored' },
+  { id: 'sleepy', name: 'Sleepy' },
 ];
