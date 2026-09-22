@@ -1,19 +1,7 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { CharacterProvider } from '../context/CharacterContext';
-import { GalleryProvider } from '../context/GalleryContext';
 import Layout from './_layout';
 
-const App = () => {
-  return (
-    <CharacterProvider>
-      <GalleryProvider>
-        <NavigationContainer>
-          <Layout />
-        </NavigationContainer>
-      </GalleryProvider>
-    </CharacterProvider>
-  );
-};
+/** Thin entry: the full provider + navigator tree lives in ./_layout. */
+const App = (): React.ReactElement => <Layout />;
 
 export default App;

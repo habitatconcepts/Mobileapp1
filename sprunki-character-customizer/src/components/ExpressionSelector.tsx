@@ -1,29 +1,35 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import type { ExpressionId } from '../types/character';
 import { expressions } from '../constants/expressions';
 
 interface ExpressionSelectorProps {
-  selectedExpression: string;
-  onSelect: (expression: string) => void;
+  selectedExpression: ExpressionId;
+  onSelect: (expression: ExpressionId) => void;
 }
 
 const ExpressionSelector: React.FC<ExpressionSelectorProps> = ({ selectedExpression, onSelect }) => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Select Expression</Text>
-      <View style={styles.expressionContainer}>
-        {expressions.map((expression) => (
-          <TouchableOpacity
-            key={expression}
-            style={[
-              styles.expressionButton,
-              selectedExpression === expression && styles.selectedButton,
-            ]}
-            onPress={() => onSelect(expression)}
-          >
-            <Text style={styles.expressionText}>{expression}</Text>
-          </TouchableOpacity>
-        ))}
+    <View testID="expression-selector" style={styles.container}>
+      <View style={styles.row}>
+        {expressions.map((expression) => {
+          const selected = expression.id === selectedExpression;
+          return (
+            <TouchableOpacity
+              key={expression.id}
+              testID={`expression-${expression.id}`}
+              accessibilityRole="button"
+              accessibilityLabel={`Expression ${expression.name}`}
+              accessibilityState={{ selected }}
+              style={[styles.chip, selected && styles.selectedChip]}
+              onPress={() => onSelect(expression.id)}
+            >
+              <Text style={[styles.chipText, selected && styles.selectedChipText]}>
+                {expression.name}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
       </View>
     </View>
   );
@@ -31,29 +37,33 @@ const ExpressionSelector: React.FC<ExpressionSelectorProps> = ({ selectedExpress
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 12,
-  },
-  expressionContainer: {
+  row: {
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
-  expressionButton: {
-    padding: 10,
-    margin: 5,
+  chip: {
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    margin: 4,
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
+    borderColor: '#CCCCCC',
+    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
   },
-  selectedButton: {
-    backgroundColor: '#e0e0e0',
+  selectedChip: {
+    backgroundColor: '#FF6F61',
+    borderColor: '#FF6F61',
   },
-  expressionText: {
-    fontSize: 16,
+  chipText: {
+    fontSize: 15,
+    color: '#333333',
+  },
+  selectedChipText: {
+    color: '#FFFFFF',
+    fontWeight: '600',
   },
 });
 

@@ -1,48 +1,73 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
-import { Customization } from '../types/customization';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import type { CharacterDef } from '../types/character';
+import CharacterPreview from './CharacterPreview';
 
 interface CharacterCardProps {
-  characterName: string;
-  characterImage: string;
-  customization: Customization;
+  character: CharacterDef;
+  onPress: () => void;
 }
 
-const CharacterCard: React.FC<CharacterCardProps> = ({ characterName, characterImage, customization }) => {
+/** One tappable character tile for the CharacterSelect screen. */
+const CharacterCard: React.FC<CharacterCardProps> = ({ character, onPress }) => {
   return (
-    <View style={styles.card}>
-      <Image source={{ uri: characterImage }} style={styles.image} />
-      <Text style={styles.name}>{characterName}</Text>
-      {/* Additional customization options can be displayed here */}
-      <View style={styles.customizationContainer}>
-        {/* Render customization options based on the customization prop */}
+    <Pressable
+      testID={`character-card-${character.id}`}
+      accessibilityRole="button"
+      accessibilityLabel={`Select ${character.name}`}
+      onPress={onPress}
+      style={({ pressed }) => [styles.card, pressed && styles.pressed]}
+    >
+      <CharacterPreview
+        config={{
+          characterId: character.id,
+          baseColor: character.baseColor,
+          expression: 'happy',
+          outfit: null,
+          accessories: [],
+          background: 'city',
+        }}
+        size={120}
+      />
+      <View style={styles.textBlock}>
+        <Text style={styles.name}>{character.name}</Text>
+        <Text style={styles.description} numberOfLines={3}>
+          {character.description}
+        </Text>
       </View>
-    </View>
+    </Pressable>
   );
 };
 
 const styles = StyleSheet.create({
   card: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    padding: 16,
+    flexDirection: 'row',
     alignItems: 'center',
-    margin: 8,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 12,
+    marginVertical: 6,
+    marginHorizontal: 16,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
   },
-  image: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+  pressed: {
+    opacity: 0.75,
+  },
+  textBlock: {
+    flex: 1,
+    marginLeft: 12,
   },
   name: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginVertical: 8,
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#333333',
+    marginBottom: 4,
   },
-  customizationContainer: {
-    // Styles for customization options
+  description: {
+    fontSize: 14,
+    color: '#666666',
+    lineHeight: 20,
   },
 });
 
